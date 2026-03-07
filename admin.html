@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - GS1-128 Barcode Scanner</title>
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="full-screen">
+        <div class="login-card">
+            <h1>🔐 Admin Access</h1>
+            <p>ใส่รหัสผ่านเพื่อจัดการข้อมูล</p>
+
+            <input
+                type="password"
+                id="password-input"
+                placeholder="กรอกรหัสผ่าน"
+                onkeypress="if(event.key==='Enter') checkPassword()"
+            >
+
+            <button onclick="checkPassword()">เข้าสู่ระบบ</button>
+            <p id="error-msg" class="error-hidden"></p>
+
+            <hr>
+            <a href="index.html" class="back-link">← กลับไปหน้า Scanner</a>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-screen" class="full-screen hidden">
+        <div class="admin-container">
+            <header>
+                <h1>⚙️ จัดการข้อมูลสินค้า</h1>
+                <button onclick="logout()" class="logout-btn">ออกจากระบบ</button>
+            </header>
+
+            <div class="admin-content">
+                <!-- Add Product Section -->
+                <div class="section">
+                    <h2>➕ เพิ่มสินค้าใหม่</h2>
+
+                    <div class="form-group">
+                        <label>GTIN (14 หลัก)</label>
+                        <input type="text" id="gtin" placeholder="เช่น 10041220210340" maxlength="14">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ชื่อสินค้า</label>
+                        <input type="text" id="product-name" placeholder="เช่น แพ็คเกจกล่อง A">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ขนาด</label>
+                        <input type="text" id="product-size" placeholder="เช่น 500 กรัม">
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL รูปภาพ</label>
+                        <input type="text" id="product-image" placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <button onclick="addProduct()" class="btn-add">✓ เพิ่มสินค้า</button>
+                </div>
+
+                <!-- Product List Section -->
+                <div class="section">
+                    <h2>📋 รายการสินค้า</h2>
+                    <div id="product-list" class="product-list"></div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="section">
+                    <h2>📤 ส่งออกข้อมูล</h2>
+                    <p class="info-text">
+                        Copy JSON นี้ไปใส่ใน <code>data.js</code> แล้ว push ขึ้น GitHub
+                    </p>
+                    <textarea id="json-export" readonly></textarea>
+                    <button onclick="copyToClipboard()" class="btn-copy">📋 Copy JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

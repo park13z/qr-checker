@@ -39,6 +39,14 @@ header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 25px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+header > div {
+    flex: 1;
     text-align: center;
 }
 
@@ -240,6 +248,23 @@ header p {
     color: #667eea;
     font-weight: bold;
     margin-right: 8px;
+}
+
+.admin-link {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.admin-link:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* Mobile optimization */
