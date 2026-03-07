@@ -185,6 +185,17 @@ class ScannerApp {
                         }
                     },
                     decoder: {
+                        readers: [
+                            "code_128_reader",
+                            "ean_reader",
+                            "ean_8_reader",
+                            "upc_reader",
+                            "upc_e_reader",
+                            "code_39_reader",
+                            "code_39_vin_reader",
+                            "codabar_reader",
+                            "i2of5_reader"
+                        ],
                         workers: 2,
                         debug: false,
                         multiple: false
@@ -208,7 +219,10 @@ class ScannerApp {
                     // Set up detection event
                     Quagga.onDetected((result) => {
                         if (result && result.codeResult && result.codeResult.code) {
+                            console.log(`✅ Detected [${result.codeResult.format}]:`, result.codeResult.code);
                             this.handleScan(result.codeResult.code);
+                        } else {
+                            console.log("⏳ Scanning... (waiting for detection)");
                         }
                     });
 
