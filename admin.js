@@ -120,16 +120,22 @@ async function loadProductsFromSupabase() {
         if (error) throw error;
 
         products = {};
-        data.forEach(product => {
-            products[product.gtin] = {
-                name: product.name,
-                size: product.size,
-                image: product.image
-            };
-        });
+
+        if (data && data.length > 0) {
+            data.forEach(product => {
+                products[product.gtin] = {
+                    name: product.name,
+                    size: product.size,
+                    image: product.image
+                };
+            });
+            console.log(`✅ Loaded ${data.length} products from Supabase:`, Object.keys(products));
+            console.log("📦 Products detail:", products);
+        } else {
+            console.warn("⚠️ No products found in Supabase (empty database)");
+        }
 
         updateProductList();
-        console.log("✅ Loaded products from Supabase:", products);
     } catch (error) {
         console.error("❌ Error loading from Supabase:", error);
         alert("⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูล");
@@ -231,8 +237,12 @@ async function deleteProduct(gtin) {
 
 function updateProductList() {
     const listDiv = document.getElementById("product-list");
+    const productCount = Object.keys(products).length;
 
-    if (Object.keys(products).length === 0) {
+    console.log(`📋 Updating product list - Total: ${productCount} items`);
+
+    if (productCount === 0) {
+        console.warn("⚠️ No products to display");
         listDiv.innerHTML = '<div class="product-item-empty">ยังไม่มีสินค้า</div>';
         return;
     }
