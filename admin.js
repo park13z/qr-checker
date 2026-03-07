@@ -145,24 +145,22 @@ async function loadProductsFromSupabase() {
 async function saveProductToSupabase(gtin, name, size, image) {
     try {
         const supabaseClient = getSupabaseClient();
-        // Try to update first
-        const { error: updateError } = await supabaseClient
+
+        // Use UPSERT (insert or update)
+        const { data, error } = await supabaseClient
             .from("products")
-            .update({ name, size, image })
-            .eq("gtin", gtin);
+            .upsert(
+                { gtin, name, size, image },
+                { onConflict: "gtin" }
+            );
 
-        if (updateError?.code === "PGRST116") {
-            // GTIN doesn't exist, insert instead
-            const { error: insertError } = await supabaseClient
-                .from("products")
-                .insert([{ gtin, name, size, image }]);
-
-            if (insertError) throw insertError;
-        } else if (updateError) {
-            throw updateError;
+        if (error) {
+            console.error("❌ Supabase error:", error);
+            throw error;
         }
 
         console.log("✅ Saved to Supabase:", gtin);
+        console.log("📦 Data saved:", data);
     } catch (error) {
         console.error("❌ Error saving to Supabase:", error);
         alert("⚠️ ไม่สามารถบันทึกข้อมูล: " + error.message);
