@@ -169,6 +169,9 @@ function addProduct() {
     document.getElementById("product-image-file").value = "";
     clearImage();
 
+    // Show sync message
+    showSyncMessage();
+
     alert("✅ เพิ่มสินค้าสำเร็จ!");
 }
 
@@ -221,4 +224,14 @@ function copyToClipboard() {
     setTimeout(() => {
         btn.textContent = originalText;
     }, 2000);
+}
+
+function showSyncMessage() {
+    const syncMsg = document.getElementById("sync-message");
+    syncMsg.classList.remove("hidden");
+
+    // Auto hide after 5 seconds
+    setTimeout(() => {
+        syncMsg.classList.add("hidden");
+    }, 5000);
 }

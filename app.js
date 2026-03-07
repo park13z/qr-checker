@@ -64,6 +64,22 @@ function decodeGS1(rawText) {
     }
 }
 
+// ===== Load Products from Storage =====
+function loadProductsFromStorage() {
+    const STORAGE_KEY = "qr_checker_products";
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+        try {
+            const storedProducts = JSON.parse(stored);
+            // Merge with productData (localStorage takes priority)
+            productData = { ...productData, ...storedProducts };
+            console.log("✅ Loaded products from localStorage:", storedProducts);
+        } catch (e) {
+            console.warn("⚠️ Error loading from localStorage:", e);
+        }
+    }
+}
+
 // ===== UI Control =====
 function showError(message) {
     const errorDiv = document.getElementById("error-msg");
@@ -151,5 +167,6 @@ function initScanner() {
 
 // ===== On Page Load =====
 document.addEventListener("DOMContentLoaded", function() {
+    loadProductsFromStorage(); // Load from localStorage first
     initScanner();
 });
