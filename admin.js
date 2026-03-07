@@ -6,7 +6,6 @@ const STORAGE_KEY = "qr_checker_products";
 document.addEventListener("DOMContentLoaded", function() {
     loadProductsFromStorage();
     updateProductList();
-    updateExportJSON();
     setupFileInput();
 });
 
@@ -159,7 +158,6 @@ function addProduct() {
 
     saveProductsToStorage();
     updateProductList();
-    updateExportJSON();
 
     // Clear form
     document.getElementById("gtin").value = "";
@@ -180,7 +178,6 @@ function deleteProduct(gtin) {
         delete products[gtin];
         saveProductsToStorage();
         updateProductList();
-        updateExportJSON();
         alert("✅ ลบสำเร็จ");
     }
 }
@@ -205,25 +202,6 @@ function updateProductList() {
             </div>
         `)
         .join("");
-}
-
-function updateExportJSON() {
-    const json = `const productData = ${JSON.stringify(products, null, 4)};`;
-    document.getElementById("json-export").value = json;
-}
-
-function copyToClipboard() {
-    const textarea = document.getElementById("json-export");
-    textarea.select();
-    document.execCommand("copy");
-
-    const btn = event.target;
-    const originalText = btn.textContent;
-    btn.textContent = "✅ Copied!";
-
-    setTimeout(() => {
-        btn.textContent = originalText;
-    }, 2000);
 }
 
 function showSyncMessage() {
