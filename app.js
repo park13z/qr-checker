@@ -68,9 +68,10 @@ class GS1Parser {
 // ===== Scanner App Class =====
 class ScannerApp {
     constructor() {
-        this.html5QrCode = null;
         this.isScanning = false;
         this.products = { ...productData }; // Start with local data
+        this.lastScannedCode = null;
+        this.lastScanTime = 0;
     }
 
     /**
@@ -167,26 +168,53 @@ class ScannerApp {
     }
 
     /**
-     * Initialize Html5QrCode scanner
+     * Initialize Quagga barcode scanner (supports 1D barcodes)
      */
     async initScanner() {
         return new Promise((resolve, reject) => {
-            this.html5QrCode = new Html5Qrcode("reader");
+            Quagga.init(
+                {
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.querySelector("#reader"),
+                        constraints: {
+                            width: { min: 640 },
+                            height: { min: 480 },
+                            facingMode: "environment" // Rear camera
+                        }
+                    },
+                    decoder: {
+                        workers: 2,
+                        debug: false,
+                        multiple: false
+                    },
+                    locator: {
+                        halfSample: true
+                    },
+                    frequency: 10
+                },
+                (err) => {
+                    if (err) {
+                        console.error("Quagga init error:", err);
+                        this.showError("❌ ไม่สามารถเปิดกล้องได้ (ต้อง HTTPS และอนุญาตให้ใช้กล้อง)");
+                        reject(err);
+                        return;
+                    }
 
-            const config = {
-                fps: 10,
-                qrbox: { width: 250, height: 250 }
-            };
+                    console.log("✅ Quagga scanner initialized");
+                    Quagga.start();
 
-            this.html5QrCode.start(
-                { facingMode: "environment" },
-                config,
-                (text) => this.handleScan(text)
-            ).then(resolve).catch(err => {
-                console.error("Scanner init error:", err);
-                this.showError("❌ ไม่สามารถเปิดกล้องได้ (ต้อง HTTPS และอนุญาตให้ใช้กล้อง)");
-                reject(err);
-            });
+                    // Set up detection event
+                    Quagga.onDetected((result) => {
+                        if (result && result.codeResult && result.codeResult.code) {
+                            this.handleScan(result.codeResult.code);
+                        }
+                    });
+
+                    resolve();
+                }
+            );
         });
     }
 
@@ -195,7 +223,14 @@ class ScannerApp {
      */
     handleScan(decodedText) {
         try {
-            console.log("Raw barcode:", decodedText);
+            // Prevent duplicate scans within 2 seconds
+            if (this.lastScannedCode === decodedText && Date.now() - this.lastScanTime < 2000) {
+                console.log("⏭️ Duplicate scan ignored:", decodedText);
+                return;
+            }
+
+            this.lastScannedCode = decodedText;
+            console.log("📦 Raw barcode:", decodedText);
 
             const info = GS1Parser.decode(decodedText);
             const product = this.products[info.gtin];
@@ -214,17 +249,16 @@ class ScannerApp {
     }
 
     /**
-     * Pause scanning for 2 seconds
+     * Pause scanning for 2 seconds (duplicate prevention)
      */
     pauseScanning() {
-        if (this.html5QrCode) {
-            this.html5QrCode.pause();
-            setTimeout(() => {
-                if (this.html5QrCode && this.isScanning) {
-                    this.html5QrCode.resume();
-                }
-            }, 2000);
-        }
+        // Store the scanned code and time to prevent duplicate scans
+        this.lastScanTime = Date.now();
+
+        // Quagga will continue but we check for duplicates in handleScan
+        setTimeout(() => {
+            this.lastScannedCode = null; // Reset after 2 seconds
+        }, 2000);
     }
 
     /**
@@ -274,9 +308,10 @@ class ScannerApp {
      * Stop scanning and cleanup
      */
     stop() {
-        if (this.html5QrCode) {
-            this.html5QrCode.stop();
+        if (this.isScanning) {
+            Quagga.stop();
             this.isScanning = false;
+            console.log("✅ Scanner stopped");
         }
     }
 }
