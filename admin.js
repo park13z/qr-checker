@@ -109,7 +109,8 @@ let products = {};
 
 async function loadProductsFromSupabase() {
     try {
-        const { data, error } = await supabase
+        const supabaseClient = getSupabaseClient();
+        const { data, error } = await supabaseClient
             .from("products")
             .select("*");
 
@@ -134,15 +135,16 @@ async function loadProductsFromSupabase() {
 
 async function saveProductToSupabase(gtin, name, size, image) {
     try {
+        const supabaseClient = getSupabaseClient();
         // Try to update first
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseClient
             .from("products")
             .update({ name, size, image })
             .eq("gtin", gtin);
 
         if (updateError?.code === "PGRST116") {
             // GTIN doesn't exist, insert instead
-            const { error: insertError } = await supabase
+            const { error: insertError } = await supabaseClient
                 .from("products")
                 .insert([{ gtin, name, size, image }]);
 
@@ -206,7 +208,8 @@ async function addProduct() {
 async function deleteProduct(gtin) {
     if (confirm(`ลบสินค้า ${products[gtin].name}?`)) {
         try {
-            const { error } = await supabase
+            const supabaseClient = getSupabaseClient();
+            const { error } = await supabaseClient
                 .from("products")
                 .delete()
                 .eq("gtin", gtin);
