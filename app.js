@@ -186,15 +186,7 @@ class ScannerApp {
                     },
                     decoder: {
                         readers: [
-                            "code_128_reader",
-                            "ean_reader",
-                            "ean_8_reader",
-                            "upc_reader",
-                            "upc_e_reader",
-                            "code_39_reader",
-                            "code_39_vin_reader",
-                            "codabar_reader",
-                            "i2of5_reader"
+                            "code_128_reader"  // Prioritize Code 128 for GS1 data
                         ],
                         workers: 2,
                         debug: false,
