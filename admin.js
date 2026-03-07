@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     loadProductsFromStorage();
     updateProductList();
     updateExportJSON();
+    setupFileInput();
 });
 
 // ===== Password Check =====
@@ -36,6 +37,76 @@ function logout() {
     document.getElementById("password-input").value = "";
 }
 
+// ===== Image Upload =====
+let uploadedImageUrl = "";
+
+function setupFileInput() {
+    const fileInput = document.getElementById("product-image-file");
+    const uploadSection = document.querySelector(".image-upload-section");
+
+    // Click to upload
+    uploadSection.addEventListener("click", () => {
+        fileInput.click();
+    });
+
+    // Drag and drop
+    uploadSection.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadSection.style.borderColor = "#764ba2";
+    });
+
+    uploadSection.addEventListener("dragleave", () => {
+        uploadSection.style.borderColor = "#667eea";
+    });
+
+    uploadSection.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleImageUpload({ target: fileInput });
+        }
+    });
+}
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    // Check file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+        alert("⚠️ ขนาดรูปต้องไม่เกิน 2MB");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const base64 = e.target.result;
+        uploadedImageUrl = base64;
+
+        // Show preview
+        const previewBox = document.getElementById("image-preview-box");
+        const previewImg = document.getElementById("image-preview");
+        previewImg.src = base64;
+        previewBox.classList.remove("hidden");
+
+        // Hide URL input
+        document.getElementById("product-image-url").style.display = "none";
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function clearImage() {
+    uploadedImageUrl = "";
+    document.getElementById("product-image-file").value = "";
+    document.getElementById("image-preview-box").classList.add("hidden");
+    document.getElementById("product-image-url").style.display = "block";
+    document.getElementById("product-image-url").value = "";
+}
+
 // ===== Product Management =====
 let products = {};
 
@@ -59,7 +130,9 @@ function addProduct() {
     const gtin = document.getElementById("gtin").value.trim();
     const name = document.getElementById("product-name").value.trim();
     const size = document.getElementById("product-size").value.trim();
-    const image = document.getElementById("product-image").value.trim();
+
+    // Get image from uploaded file or URL input
+    let image = uploadedImageUrl || document.getElementById("product-image-url").value.trim();
 
     // Validation
     if (!gtin || !name || !size || !image) {
@@ -92,7 +165,9 @@ function addProduct() {
     document.getElementById("gtin").value = "";
     document.getElementById("product-name").value = "";
     document.getElementById("product-size").value = "";
-    document.getElementById("product-image").value = "";
+    document.getElementById("product-image-url").value = "";
+    document.getElementById("product-image-file").value = "";
+    clearImage();
 
     alert("✅ เพิ่มสินค้าสำเร็จ!");
 }

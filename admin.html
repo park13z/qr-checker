@@ -57,8 +57,16 @@
                     </div>
 
                     <div class="form-group">
-                        <label>URL รูปภาพ</label>
-                        <input type="text" id="product-image" placeholder="https://example.com/image.jpg">
+                        <label>รูปภาพ</label>
+                        <div class="image-upload-section">
+                            <input type="file" id="product-image-file" accept="image/*" onchange="handleImageUpload(event)">
+                            <p class="upload-hint">เลือกรูป หรือ paste URL</p>
+                        </div>
+                        <div id="image-preview-box" class="image-preview-box hidden">
+                            <img id="image-preview" src="" alt="Preview">
+                            <button type="button" onclick="clearImage()" class="btn-clear-image">✕ เปลี่ยน</button>
+                        </div>
+                        <input type="text" id="product-image-url" placeholder="https://example.com/image.jpg" class="image-url-input">
                     </div>
 
                     <button onclick="addProduct()" class="btn-add">✓ เพิ่มสินค้า</button>
