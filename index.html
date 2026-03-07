@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GS1-128 Barcode Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📦 สแกนเช็คแพ็คเกจ</h1>
+            <p>GS1-128 Barcode Scanner</p>
+        </header>
+
+        <div class="scanner-section">
+            <div id="reader"></div>
+            <p class="scanner-hint">วางบาร์โค้ดให้พอดีกับกรอบ</p>
+        </div>
+
+        <div id="result" class="result-card hidden">
+            <button class="close-btn" onclick="clearResult()">✕</button>
+
+            <div class="result-image">
+                <img id="p-img" src="" alt="Product Image">
+            </div>
+
+            <div class="result-info">
+                <h2 id="p-name">ชื่อสินค้า</h2>
+                <p class="size">ขนาด: <span id="p-size"></span></p>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>วันที่แพ็ก</label>
+                        <span id="p-date">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Lot Number</label>
+                        <span id="p-lot">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>GTIN</label>
+                        <span id="p-gtin" class="gtin">-</span>
+                    </div>
+                </div>
+
+                <div class="status-indicator success">
+                    <span>✓ ตรวจสอบสำเร็จ</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-msg" class="error-card hidden">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="info-section">
+            <h3>ℹ️ วิธีใช้งาน</h3>
+            <ul>
+                <li>อนุญาตให้ใช้กล้อง</li>
+                <li>วางบาร์โค้ดหน้ากล้อง</li>
+                <li>รอจนกว่ากล้องจะสแกนอัตโนมัติ</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
