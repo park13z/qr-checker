@@ -64,19 +64,37 @@ function decodeGS1(rawText) {
     }
 }
 
-// ===== Load Products from Storage =====
-function loadProductsFromStorage() {
-    const STORAGE_KEY = "qr_checker_products";
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-        try {
-            const storedProducts = JSON.parse(stored);
-            // Merge with productData (localStorage takes priority)
-            productData = { ...productData, ...storedProducts };
-            console.log("✅ Loaded products from localStorage:", storedProducts);
-        } catch (e) {
-            console.warn("⚠️ Error loading from localStorage:", e);
+// ===== Supabase Configuration =====
+const SUPABASE_URL = "https://fgvgcvezvztjidsrouyx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_aTlqNyccQYzgiaeIstjr7g_s6F6hMob";
+
+const { createClient } = window.supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ===== Load Products from Supabase =====
+async function loadProductsFromSupabase() {
+    try {
+        const { data, error } = await supabase
+            .from("products")
+            .select("*");
+
+        if (error) {
+            console.warn("⚠️ Supabase load failed, using local data:", error);
+            return;
         }
+
+        if (data && data.length > 0) {
+            data.forEach(product => {
+                productData[product.gtin] = {
+                    name: product.name,
+                    size: product.size,
+                    image: product.image
+                };
+            });
+            console.log("✅ Loaded products from Supabase:", data.length);
+        }
+    } catch (error) {
+        console.error("❌ Error loading from Supabase:", error);
     }
 }
 
@@ -166,7 +184,7 @@ function initScanner() {
 }
 
 // ===== On Page Load =====
-document.addEventListener("DOMContentLoaded", function() {
-    loadProductsFromStorage(); // Load from localStorage first
+document.addEventListener("DOMContentLoaded", async function() {
+    await loadProductsFromSupabase(); // Load from Supabase first
     initScanner();
 });

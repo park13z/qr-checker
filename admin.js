@@ -1,11 +1,15 @@
 // ===== Configuration =====
 const ADMIN_PASSWORD = "tgf2026!";
-const STORAGE_KEY = "qr_checker_products";
+const SUPABASE_URL = "https://fgvgcvezvztjidsrouyx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_aTlqNyccQYzgiaeIstjr7g_s6F6hMob";
+
+// Initialize Supabase
+const { createClient } = window.supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ===== Initialize =====
 document.addEventListener("DOMContentLoaded", function() {
-    loadProductsFromStorage();
-    updateProductList();
+    loadProductsFromSupabase();
     setupFileInput();
 });
 
@@ -109,23 +113,58 @@ function clearImage() {
 // ===== Product Management =====
 let products = {};
 
-function loadProductsFromStorage() {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-        try {
-            products = JSON.parse(stored);
-        } catch (e) {
-            console.error("Error loading products:", e);
-            products = {};
-        }
+async function loadProductsFromSupabase() {
+    try {
+        const { data, error } = await supabase
+            .from("products")
+            .select("*");
+
+        if (error) throw error;
+
+        products = {};
+        data.forEach(product => {
+            products[product.gtin] = {
+                name: product.name,
+                size: product.size,
+                image: product.image
+            };
+        });
+
+        updateProductList();
+        console.log("✅ Loaded products from Supabase:", products);
+    } catch (error) {
+        console.error("❌ Error loading from Supabase:", error);
+        alert("⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูล");
     }
 }
 
-function saveProductsToStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+async function saveProductToSupabase(gtin, name, size, image) {
+    try {
+        // Try to update first
+        const { error: updateError } = await supabase
+            .from("products")
+            .update({ name, size, image })
+            .eq("gtin", gtin);
+
+        if (updateError?.code === "PGRST116") {
+            // GTIN doesn't exist, insert instead
+            const { error: insertError } = await supabase
+                .from("products")
+                .insert([{ gtin, name, size, image }]);
+
+            if (insertError) throw insertError;
+        } else if (updateError) {
+            throw updateError;
+        }
+
+        console.log("✅ Saved to Supabase:", gtin);
+    } catch (error) {
+        console.error("❌ Error saving to Supabase:", error);
+        alert("⚠️ ไม่สามารถบันทึกข้อมูล: " + error.message);
+    }
 }
 
-function addProduct() {
+async function addProduct() {
     const gtin = document.getElementById("gtin").value.trim();
     const name = document.getElementById("product-name").value.trim();
     const size = document.getElementById("product-size").value.trim();
@@ -144,19 +183,16 @@ function addProduct() {
         return;
     }
 
-    if (products[gtin]) {
-        alert("⚠️ GTIN นี้มีอยู่แล้ว ให้ลบออกก่อนหรือแก้ไข");
-        return;
-    }
+    // Save to Supabase
+    await saveProductToSupabase(gtin, name, size, image);
 
-    // Add product
+    // Add to local products
     products[gtin] = {
         name: name,
         size: size,
         image: image
     };
 
-    saveProductsToStorage();
     updateProductList();
 
     // Clear form
@@ -173,12 +209,23 @@ function addProduct() {
     alert("✅ เพิ่มสินค้าสำเร็จ!");
 }
 
-function deleteProduct(gtin) {
+async function deleteProduct(gtin) {
     if (confirm(`ลบสินค้า ${products[gtin].name}?`)) {
-        delete products[gtin];
-        saveProductsToStorage();
-        updateProductList();
-        alert("✅ ลบสำเร็จ");
+        try {
+            const { error } = await supabase
+                .from("products")
+                .delete()
+                .eq("gtin", gtin);
+
+            if (error) throw error;
+
+            delete products[gtin];
+            updateProductList();
+            alert("✅ ลบสำเร็จ");
+        } catch (error) {
+            console.error("Error deleting product:", error);
+            alert("⚠️ ไม่สามารถลบสินค้า: " + error.message);
+        }
     }
 }
 
