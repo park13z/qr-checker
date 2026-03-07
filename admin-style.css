@@ -225,6 +225,7 @@ body {
 /* Form Styles */
 .form-group {
     margin-bottom: 15px;
+    overflow: hidden;
 }
 
 .form-group label {
@@ -243,6 +244,7 @@ body {
     border-radius: 8px;
     font-size: 14px;
     transition: border-color 0.3s;
+    box-sizing: border-box;
 }
 
 .form-group input:focus {
@@ -389,6 +391,7 @@ textarea:focus {
 .image-upload-section {
     position: relative;
     margin-bottom: 10px;
+    overflow: hidden;
 }
 
 .image-upload-section input[type="file"] {
@@ -408,6 +411,7 @@ textarea:focus {
     font-weight: 600;
     color: #667eea;
     transition: all 0.3s;
+    box-sizing: border-box;
 }
 
 .image-upload-section:hover::before {

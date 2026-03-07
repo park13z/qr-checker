@@ -14,14 +14,15 @@
             <h1>🔐 Admin Access</h1>
             <p>ใส่รหัสผ่านเพื่อจัดการข้อมูล</p>
 
-            <input
-                type="password"
-                id="password-input"
-                placeholder="กรอกรหัสผ่าน"
-                onkeypress="if(event.key==='Enter') checkPassword()"
-            >
-
-            <button onclick="checkPassword()">เข้าสู่ระบบ</button>
+            <form onsubmit="event.preventDefault(); checkPassword();">
+                <input
+                    type="password"
+                    id="password-input"
+                    placeholder="กรอกรหัสผ่าน"
+                    required
+                >
+                <button type="submit">เข้าสู่ระบบ</button>
+            </form>
             <p id="error-msg" class="error-hidden"></p>
 
             <hr>
