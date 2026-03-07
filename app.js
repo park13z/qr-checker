@@ -64,16 +64,15 @@ function decodeGS1(rawText) {
     }
 }
 
-// ===== Supabase Configuration =====
-const SUPABASE_URL = "https://fgvgcvezvztjidsrouyx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_aTlqNyccQYzgiaeIstjr7g_s6F6hMob";
-
-const { createClient } = window.supabase;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
 // ===== Load Products from Supabase =====
 async function loadProductsFromSupabase() {
     try {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+            console.warn("⚠️ Supabase not initialized");
+            return;
+        }
+
         const { data, error } = await supabase
             .from("products")
             .select("*");

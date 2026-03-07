@@ -1,11 +1,5 @@
 // ===== Configuration =====
 const ADMIN_PASSWORD = "tgf2026!";
-const SUPABASE_URL = "https://fgvgcvezvztjidsrouyx.supabase.co";
-const SUPABASE_KEY = "sb_publishable_aTlqNyccQYzgiaeIstjr7g_s6F6hMob";
-
-// Initialize Supabase
-const { createClient } = window.supabase;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ===== Initialize =====
 document.addEventListener("DOMContentLoaded", function() {
