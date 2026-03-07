@@ -180,12 +180,12 @@ function initScanner() {
     html5QrCode = new Html5Qrcode("reader");
 
     const config = {
-        fps: 15,
-        qrbox: { width: 280, height: 100 }
+        fps: 10,
+        qrbox: { width: 250, height: 250 }
     };
 
     html5QrCode.start(
-        { facingMode: { exact: "environment" } }, // ใช้กล้องหลังอุปกรณ์
+        { facingMode: "environment" }, // ใช้กล้องหลังอุปกรณ์
         config,
         onScanSuccess
     ).catch(err => {
