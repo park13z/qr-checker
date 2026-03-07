@@ -196,6 +196,8 @@ function initScanner() {
 
 // ===== On Page Load =====
 document.addEventListener("DOMContentLoaded", async function() {
+    // Wait for Supabase to be ready
+    await new Promise(resolve => setTimeout(resolve, 500));
     await loadProductsFromSupabase(); // Load from Supabase first
     // Don't start camera automatically - wait for user to click button
 });

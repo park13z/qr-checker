@@ -3,8 +3,11 @@ const ADMIN_PASSWORD = "tgf2026!";
 
 // ===== Initialize =====
 document.addEventListener("DOMContentLoaded", function() {
-    loadProductsFromSupabase();
-    setupFileInput();
+    // Wait for Supabase to be ready
+    setTimeout(() => {
+        loadProductsFromSupabase();
+        setupFileInput();
+    }, 500);
 });
 
 // ===== Password Check =====
