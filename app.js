@@ -116,6 +116,18 @@ function clearResult() {
 
 // ===== Scanner Setup =====
 let html5QrCode;
+let isCameraActive = false;
+
+function startCamera() {
+    if (isCameraActive) return;
+
+    isCameraActive = true;
+    document.getElementById("start-screen").classList.add("hidden");
+    document.getElementById("reader").classList.remove("hidden");
+    document.getElementById("scanner-hint").style.display = "block";
+
+    initScanner();
+}
 
 function onScanSuccess(decodedText) {
     try {
@@ -186,5 +198,5 @@ function initScanner() {
 // ===== On Page Load =====
 document.addEventListener("DOMContentLoaded", async function() {
     await loadProductsFromSupabase(); // Load from Supabase first
-    initScanner();
+    // Don't start camera automatically - wait for user to click button
 });

@@ -18,8 +18,16 @@
         </header>
 
         <div class="scanner-section">
-            <div id="reader"></div>
-            <p class="scanner-hint">วางบาร์โค้ดให้พอดีกับกรอบ</p>
+            <div id="reader" class="hidden"></div>
+            <div id="start-screen" class="start-screen">
+                <div class="start-content">
+                    <div class="camera-icon">📷</div>
+                    <h2>เปิดกล้องเพื่อสแกน</h2>
+                    <p>กดปุ่มด้านล่าง เพื่อเริ่มใช้งาน</p>
+                    <button onclick="startCamera()" class="btn-start-camera">📷 เปิดกล้อง</button>
+                </div>
+            </div>
+            <p class="scanner-hint" id="scanner-hint">วางบาร์โค้ดให้พอดีกับกรอบ</p>
         </div>
 
         <div id="result" class="result-card hidden">

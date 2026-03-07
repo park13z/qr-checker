@@ -80,6 +80,78 @@ header p {
     text-align: center;
 }
 
+.start-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.start-screen.hidden {
+    display: none;
+}
+
+.start-content {
+    text-align: center;
+    padding: 40px;
+}
+
+.camera-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.start-content h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.start-content p {
+    color: #666;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+.btn-start-camera {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-start-camera:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-start-camera:active {
+    transform: translateY(0);
+}
+
+#reader.hidden {
+    display: none;
+}
+
 .result-card {
     padding: 25px;
     animation: fadeIn 0.4s ease-out;
