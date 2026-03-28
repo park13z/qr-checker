@@ -113,6 +113,11 @@ let products = {};
 async function loadProductsFromSupabase() {
     try {
         const supabaseClient = getSupabaseClient();
+        if (!supabaseClient) {
+            console.warn("⚠️ Supabase not initialized, cannot load products");
+            updateProductList();
+            return;
+        }
         const { data, error } = await supabaseClient
             .from("products")
             .select("*");
@@ -245,18 +250,39 @@ function updateProductList() {
         return;
     }
 
-    listDiv.innerHTML = Object.entries(products)
-        .map(([gtin, product]) => `
-            <div class="product-item">
-                <div class="product-info">
-                    <strong>${product.name}</strong>
-                    <small>GTIN: ${gtin} | ขนาด: ${product.size}</small>
-                    <small>รูป: ${product.image.substring(0, 50)}...</small>
-                </div>
-                <button class="btn-delete" onclick="deleteProduct('${gtin}')">🗑️ ลบ</button>
-            </div>
-        `)
-        .join("");
+    listDiv.innerHTML = "";
+    Object.entries(products).forEach(([gtin, product]) => {
+        const item = document.createElement("div");
+        item.className = "product-item";
+
+        const info = document.createElement("div");
+        info.className = "product-info";
+
+        const nameEl = document.createElement("strong");
+        nameEl.textContent = product.name;
+
+        const gtinEl = document.createElement("small");
+        gtinEl.textContent = `GTIN: ${gtin} | ขนาด: ${product.size}`;
+
+        const imageEl = document.createElement("small");
+        const imageStr = product.image || "";
+        imageEl.textContent = `รูป: ${imageStr.substring(0, 50)}${imageStr.length > 50 ? "..." : ""}`;
+
+        info.appendChild(nameEl);
+        info.appendChild(document.createElement("br"));
+        info.appendChild(gtinEl);
+        info.appendChild(document.createElement("br"));
+        info.appendChild(imageEl);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn-delete";
+        deleteBtn.textContent = "🗑️ ลบ";
+        deleteBtn.addEventListener("click", () => deleteProduct(gtin));
+
+        item.appendChild(info);
+        item.appendChild(deleteBtn);
+        listDiv.appendChild(item);
+    });
 }
 
 function showSyncMessage() {

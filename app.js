@@ -15,21 +15,41 @@ class GS1Parser {
         try {
             let cleanText = rawText.replace(/[\(\)]/g, "").trim();
 
-            // Use Regex for more robust parsing
+            // Locate GTIN (AI "01", fixed 14 digits)
             const gtinMatch = cleanText.match(/01(\d{14})/);
-            const dateMatch = cleanText.match(/13(\d{6})/);
-            const lotMatch = cleanText.match(/10([^\d][^\d]{0,}|[^0-9]+)?/);
-
             if (!gtinMatch) {
                 throw new Error("ไม่พบ GTIN Identifier (01)");
             }
+            const gtin = gtinMatch[1];
 
-            return {
-                gtin: gtinMatch[1],
-                fullDate: dateMatch ? this.formatDate(dateMatch[1]) : "ไม่ระบุ",
-                lot: lotMatch && lotMatch[1] ? lotMatch[1].trim() : this.extractLotFallback(cleanText),
-                raw: rawText
-            };
+            // Parse remaining AIs sequentially after the GTIN block to avoid
+            // false matches on digit sequences inside the GTIN value itself.
+            const startPos = cleanText.indexOf(gtinMatch[0]) + gtinMatch[0].length;
+            let remaining = cleanText.substring(startPos);
+
+            let packDate = "ไม่ระบุ";
+            let lot = "ไม่ระบุ";
+
+            while (remaining.length >= 2) {
+                const ai = remaining.substring(0, 2);
+                if (ai === "13") {
+                    // Pack date: 6 fixed digits (YYMMDD)
+                    packDate = this.formatDate(remaining.substring(2, 8));
+                    remaining = remaining.substring(8);
+                } else if (ai === "10") {
+                    // Lot number: variable length (up to 20 chars).
+                    // Terminated by a recognisable fixed-length AI or end of string.
+                    const lotRaw = remaining.substring(2);
+                    const nextFixed = lotRaw.search(/(?=13\d{6}|15\d{6}|17\d{6})/);
+                    lot = (nextFixed === -1 ? lotRaw : lotRaw.substring(0, nextFixed)).trim() || "ไม่ระบุ";
+                    remaining = nextFixed === -1 ? "" : lotRaw.substring(nextFixed);
+                } else {
+                    // Unknown or unhandled AI — advance by one character to avoid an infinite loop
+                    remaining = remaining.substring(1);
+                }
+            }
+
+            return { gtin, fullDate: packDate, lot, raw: rawText };
         } catch (error) {
             throw new Error("แยกข้อมูล Barcode ล้มเหลว: " + error.message);
         }
@@ -44,24 +64,6 @@ class GS1Parser {
         const month = yymmdd.substring(2, 4);
         const day = yymmdd.substring(4, 6);
         return `${year}-${month}-${day}`;
-    }
-
-    /**
-     * Fallback method to extract lot number using indexOf
-     */
-    static extractLotFallback(cleanText) {
-        const lotStart = cleanText.indexOf(this.AI.LOT);
-        if (lotStart === -1) return "ไม่ระบุ";
-
-        let nextAI = cleanText.length;
-        for (let ai of ["13", "15", "17", "20"]) {
-            const pos = cleanText.indexOf(ai, lotStart + 2);
-            if (pos !== -1 && pos < nextAI) {
-                nextAI = pos;
-            }
-        }
-
-        return cleanText.substring(lotStart + 2, nextAI) || "ไม่ระบุ";
     }
 }
 
